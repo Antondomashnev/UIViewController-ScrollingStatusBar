@@ -21,6 +21,7 @@
 		6D86600E195A170D0008FE39 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D865FF0195A170D0008FE39 /* UIKit.framework */; };
 		6D866016195A170D0008FE39 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D866014195A170D0008FE39 /* InfoPlist.strings */; };
 		6D866018195A170D0008FE39 /* UIViewControllerScrollingStatusBarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D866017195A170D0008FE39 /* UIViewControllerScrollingStatusBarTests.m */; };
+		6D866024195A18A40008FE39 /* UIViewController+ScrollingStatusBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D866023195A18A40008FE39 /* UIViewController+ScrollingStatusBar.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,8 @@
 		6D866013195A170D0008FE39 /* UIViewControllerScrollingStatusBarTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "UIViewControllerScrollingStatusBarTests-Info.plist"; sourceTree = "<group>"; };
 		6D866015195A170D0008FE39 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6D866017195A170D0008FE39 /* UIViewControllerScrollingStatusBarTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UIViewControllerScrollingStatusBarTests.m; sourceTree = "<group>"; };
+		6D866022195A18A40008FE39 /* UIViewController+ScrollingStatusBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+ScrollingStatusBar.h"; sourceTree = "<group>"; };
+		6D866023195A18A40008FE39 /* UIViewController+ScrollingStatusBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+ScrollingStatusBar.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,7 @@
 		6D865FE0195A170C0008FE39 = {
 			isa = PBXGroup;
 			children = (
+				6D866021195A18770008FE39 /* Source */,
 				6D865FF2195A170D0008FE39 /* UIViewControllerScrollingStatusBar */,
 				6D866011195A170D0008FE39 /* UIViewControllerScrollingStatusBarTests */,
 				6D865FEB195A170C0008FE39 /* Frameworks */,
@@ -150,6 +154,15 @@
 				6D866014195A170D0008FE39 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		6D866021195A18770008FE39 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				6D866022195A18A40008FE39 /* UIViewController+ScrollingStatusBar.h */,
+				6D866023195A18A40008FE39 /* UIViewController+ScrollingStatusBar.m */,
+			);
+			path = Source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -251,6 +264,7 @@
 			files = (
 				6D866003195A170D0008FE39 /* ViewController.m in Sources */,
 				6D865FFD195A170D0008FE39 /* AppDelegate.m in Sources */,
+				6D866024195A18A40008FE39 /* UIViewController+ScrollingStatusBar.m in Sources */,
 				6D865FF9195A170D0008FE39 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
