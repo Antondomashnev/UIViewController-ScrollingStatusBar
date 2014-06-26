@@ -4,7 +4,7 @@ UIViewController-ScrollingStatusBar
 
 Category for UIViewController with UIScrollView to scroll statusBar along any UIScrollView subclass.
 
-<img src="http://cl.ly/image/2w0E2P1z1y04" width="320" />
+<img src="https://dl.dropboxusercontent.com/u/25847340/UIViewController-ScrollingStatusBar/demo.gif" width="320" />
 
 ------------
 Requirements
