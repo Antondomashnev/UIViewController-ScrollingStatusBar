@@ -36,7 +36,7 @@ There is an old school way to add the UIViewController-ScrollingStatusBar to you
 Usage
 =====
 
-You can create scrolling status bar with only a one line of code for 
+You can create scrolling status bar with only a one line of code for any UIViewController subclass
 ```objective-c
 /*
   import category
