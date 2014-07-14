@@ -56,10 +56,27 @@ NSString* const ADScrollingHandlerDidScrollBlock = @"ADScrollingHandlerDidScroll
 @end
 
 
+@interface ADStatusBarWindow : UIWindow
+
+@end
+
+@implementation ADStatusBarWindow
+
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
+{
+    /*
+     20 points hardcoded for performance reason (default portrait status bar height)
+     */
+    return point.y <= 20.;
+}
+
+@end
+
+
 NSString* const UIViewControllerScrollingStatusBarContext = @"UIViewControllerScrollingStatusBarContext";
 NSString* const UIViewControllerScrollingHandler = @"UIViewControllerScrollingHandler";
 NSString* const UIViewControllerStatusBarView = @"UIViewControllerStatusBarView";
-NSString* const UIViewControllerStatusBarWindow = @"UIViewControllerStatusBarWindow";
+NSString* const UIViewControllerScrollView = @"UIViewControllerScrollView";
 
 @implementation UIViewController (ScrollingStatusBar)
 
@@ -75,7 +92,6 @@ NSString* const UIViewControllerStatusBarWindow = @"UIViewControllerStatusBarWin
     return objc_getAssociatedObject(self, (__bridge const void *)(UIViewControllerScrollingHandler));
 }
 
-
 - (void)setStatusBarView:(UIView *)statusBarView
 {
     objc_setAssociatedObject(self, (__bridge const void *)(UIViewControllerStatusBarView), statusBarView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -86,14 +102,21 @@ NSString* const UIViewControllerStatusBarWindow = @"UIViewControllerStatusBarWin
     return objc_getAssociatedObject(self, (__bridge const void *)(UIViewControllerStatusBarView));
 }
 
-- (void)setStatusBarWindow:(UIView *)statusBarWindow
+- (void)setScrollView:(UIScrollView *)scrollView
 {
-    objc_setAssociatedObject(self, (__bridge const void *)(UIViewControllerStatusBarWindow), statusBarWindow, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, (__bridge const void *)(UIViewControllerScrollView), scrollView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (UIWindow *)statusBarWindow
+- (UIScrollView *)scrollView
 {
-    return objc_getAssociatedObject(self, (__bridge const void *)(UIViewControllerStatusBarWindow));
+    return objc_getAssociatedObject(self, (__bridge const void *)(UIViewControllerScrollView));
+}
+
+#pragma mark - Gestures
+
+- (void)statusBarViewTap:(UITapGestureRecognizer *)tap
+{
+    [self.scrollView setContentOffset:CGPointMake(0, -self.scrollView.contentInset.top) animated:YES];
 }
 
 #pragma mark - UI
@@ -103,9 +126,9 @@ static UIWindow *fakeStatusBarWindow = nil;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        fakeStatusBarWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        fakeStatusBarWindow = [[ADStatusBarWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
         fakeStatusBarWindow.backgroundColor = [UIColor clearColor];
-        fakeStatusBarWindow.userInteractionEnabled = NO;
+        fakeStatusBarWindow.userInteractionEnabled = YES;
         fakeStatusBarWindow.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         fakeStatusBarWindow.windowLevel = UIWindowLevelStatusBar;
         fakeStatusBarWindow.hidden = NO;
@@ -116,10 +139,16 @@ static UIWindow *fakeStatusBarWindow = nil;
 - (void)createStatusBarView
 {
     CGRect frame = [UIApplication sharedApplication].statusBarFrame;
+    frame.size.height *= 2;
     self.statusBarView = [[UIView alloc] initWithFrame:frame];
     self.statusBarView.clipsToBounds = YES;
+    self.statusBarView.backgroundColor = [UIColor clearColor];
     UIView *statusBarImageView = [[UIScreen mainScreen] snapshotViewAfterScreenUpdates:NO];
-    [self.statusBarView addSubview:statusBarImageView];
+    UIView *statusBarImageViewClipView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height * 0.5)];
+    statusBarImageViewClipView.clipsToBounds = YES;
+    [statusBarImageViewClipView addSubview:statusBarImageView];
+    [self.statusBarView addSubview:statusBarImageViewClipView];
+    [self.statusBarView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(statusBarViewTap:)]];
     [self.fakeStatusBarWindow addSubview:self.statusBarView];
 }
 
@@ -133,7 +162,7 @@ static UIWindow *fakeStatusBarWindow = nil;
             [self createStatusBarView];
             [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
         }
-        self.statusBarView.frame = (CGRect){.origin = CGPointMake(self.statusBarView.frame.origin.x, -scrollView.contentInset.top - offsetY), .size = self.statusBarView.frame.size};
+        self.statusBarView.frame = (CGRect){.origin = CGPointMake(self.statusBarView.frame.origin.x, MAX(-self.statusBarView.frame.size.height * 0.5, -scrollView.contentInset.top - offsetY)), .size = self.statusBarView.frame.size};
     }
     else{
         if(self.statusBarView){
@@ -148,16 +177,20 @@ static UIWindow *fakeStatusBarWindow = nil;
 
 - (void)enableStatusBarScrollingAlongScrollView:(UIScrollView *)scrollView
 {
+    NSParameterAssert(scrollView);
+    
     __weak id wSelf = self;
     self.scrollingHandler = [[ADScrollingHandler alloc] initWithDidScrollBlock:^(UIScrollView *scrollView) {
         [wSelf scrollViewDidScroll:scrollView];
     }];
     
+    self.scrollView = scrollView;
     [scrollView addObserver:self.scrollingHandler forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:(__bridge void *)(UIViewControllerScrollingStatusBarContext)];
 }
 
 - (void)disableStatusBarScrollingAlongScrollView:(UITableView *)scrollView
 {
+    self.scrollView = nil;
     [scrollView removeObserver:self.scrollingHandler forKeyPath:@"contentOffset" context:(__bridge void *)(UIViewControllerScrollingStatusBarContext)];
 }
 
